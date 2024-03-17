@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{376aff99-94a6-41b4-b838-9c02fa751512}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{aeca6884-0cd7-42e5-8239-34c29cf05394}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{0e182c6b-a5d7-4431-8408-4d69b2e0e593}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CameraScript.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Converter.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="AsimpTool.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="AsTypes.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticMeshDemo.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUIDemo.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationDemo.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="TweenDemo.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyDemo.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CameraScript.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Converter.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="AsimpTool.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="AsTypes.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticMeshDemo.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUIDemo.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationDemo.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="TweenDemo.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyDemo.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

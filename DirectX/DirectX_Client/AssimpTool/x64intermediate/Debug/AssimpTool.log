@@ -1,0 +1,3 @@
+﻿  SkyDemo.cpp
+D:\DirectX\DirectX_Client\Libraries\Include\Engine\Camera.h(58,17): warning C4552: '!=': 식의 결과가 사용되지 않습니다.
+  AssimpTool.vcxproj -> D:\DirectX\DirectX_Client\Binaries\AssimpTool.exe
