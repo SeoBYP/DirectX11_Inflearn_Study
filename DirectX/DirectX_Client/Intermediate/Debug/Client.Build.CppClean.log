@@ -1,0 +1,88 @@
+d:\directx\directx_client\intermediate\debug\client.pch
+d:\directx\directx_client\intermediate\debug\vc143.pdb
+d:\directx\directx_client\intermediate\debug\vc143.idb
+d:\directx\directx_client\intermediate\debug\pch.obj
+d:\directx\directx_client\intermediate\debug\main.obj
+d:\directx\directx_client\intermediate\debug\camerascript.obj
+d:\directx\directx_client\intermediate\debug\18. normalmappingdemo.obj
+d:\directx\directx_client\intermediate\debug\17. materialdemo.obj
+d:\directx\directx_client\intermediate\debug\16. lightingdemo.obj
+d:\directx\directx_client\intermediate\debug\15. emissivedemo.obj
+d:\directx\directx_client\intermediate\debug\14. sperculardemo.obj
+d:\directx\directx_client\intermediate\debug\13. diffusedemo.obj
+d:\directx\directx_client\intermediate\debug\12. ambientdemo.obj
+d:\directx\directx_client\intermediate\debug\11. depthstencildemo.obj
+d:\directx\directx_client\intermediate\debug\10. globaltestdemo.obj
+d:\directx\directx_client\intermediate\debug\09. meshdemo.obj
+d:\directx\directx_client\intermediate\debug\08. normaldemo.obj
+d:\directx\directx_client\intermediate\debug\07. heightmapdemo.obj
+d:\directx\directx_client\intermediate\debug\06. samplerdemo.obj
+d:\directx\directx_client\intermediate\debug\05. texturedemo.obj
+d:\directx\directx_client\intermediate\debug\04. camerademo.obj
+d:\directx\directx_client\intermediate\debug\03. constbufferdemo.obj
+d:\directx\directx_client\intermediate\debug\02. quaddemo.obj
+d:\directx\directx_client\intermediate\debug\01. triangledemo.obj
+d:\directx\directx_client\binaries\01. triangle.cso
+d:\directx\directx_client\binaries\02. quad.cso
+d:\directx\directx_client\binaries\03. constbuffer.cso
+d:\directx\directx_client\binaries\04. texture.cso
+d:\directx\directx_client\binaries\05. sampler.cso
+d:\directx\directx_client\binaries\06. terrain.cso
+d:\directx\directx_client\binaries\07. normal.cso
+d:\directx\directx_client\binaries\00. global.cso
+d:\directx\directx_client\binaries\00. light.cso
+d:\directx\directx_client\binaries\08. globaltest.cso
+d:\directx\directx_client\binaries\09. lighting_ambient.cso
+d:\directx\directx_client\binaries\10. lighting_diffuse.cso
+d:\directx\directx_client\binaries\11. lighting_specular.cso
+d:\directx\directx_client\binaries\12. lighting_emissive.cso
+d:\directx\directx_client\binaries\13. lighting.cso
+d:\directx\directx_client\binaries\14. normalmapping.cso
+d:\directx\directx_client\binaries\15. modeldemo.cso
+d:\directx\directx_client\intermediate\debug\client.ilk
+d:\directx\directx_client\binaries\client.exe
+d:\directx\directx_client\binaries\client.pdb
+d:\directx\directx_client\intermediate\debug\camera.obj
+d:\directx\directx_client\intermediate\debug\component.obj
+d:\directx\directx_client\intermediate\debug\constantbuffer.obj
+d:\directx\directx_client\intermediate\debug\fileutils.obj
+d:\directx\directx_client\intermediate\debug\game.obj
+d:\directx\directx_client\intermediate\debug\gameobject.obj
+d:\directx\directx_client\intermediate\debug\geometry.obj
+d:\directx\directx_client\intermediate\debug\geometryhelper.obj
+d:\directx\directx_client\intermediate\debug\graphics.obj
+d:\directx\directx_client\intermediate\debug\iexecute.obj
+d:\directx\directx_client\intermediate\debug\indexbuffer.obj
+d:\directx\directx_client\intermediate\debug\inputmanager.obj
+d:\directx\directx_client\intermediate\debug\material.obj
+d:\directx\directx_client\intermediate\debug\mesh.obj
+d:\directx\directx_client\intermediate\debug\meshrenderer.obj
+d:\directx\directx_client\intermediate\debug\model.obj
+d:\directx\directx_client\intermediate\debug\modelmesh.obj
+d:\directx\directx_client\intermediate\debug\modelrenderer.obj
+d:\directx\directx_client\intermediate\debug\monobehaviour.obj
+d:\directx\directx_client\intermediate\debug\pass.obj
+d:\directx\directx_client\intermediate\debug\rendermanager.obj
+d:\directx\directx_client\intermediate\debug\resourcebase.obj
+d:\directx\directx_client\intermediate\debug\resourcemanager.obj
+d:\directx\directx_client\intermediate\debug\shader.obj
+d:\directx\directx_client\intermediate\debug\simplemath.obj
+d:\directx\directx_client\intermediate\debug\technique.obj
+d:\directx\directx_client\intermediate\debug\texture.obj
+d:\directx\directx_client\intermediate\debug\timemanager.obj
+d:\directx\directx_client\intermediate\debug\tinyxml2.obj
+d:\directx\directx_client\intermediate\debug\transform.obj
+d:\directx\directx_client\intermediate\debug\utils.obj
+d:\directx\directx_client\intermediate\debug\vertexbuffer.obj
+d:\directx\directx_client\intermediate\debug\vertexdata.obj
+d:\directx\directx_client\intermediate\debug\engine.pch
+d:\directx\directx_client\intermediate\debug\client.vcxproj.filelistabsolute.txt
+d:\directx\directx_client\intermediate\debug\client.tlog\cl.command.1.tlog
+d:\directx\directx_client\intermediate\debug\client.tlog\cl.read.1.tlog
+d:\directx\directx_client\intermediate\debug\client.tlog\cl.write.1.tlog
+d:\directx\directx_client\intermediate\debug\client.tlog\fxc.command.1.tlog
+d:\directx\directx_client\intermediate\debug\client.tlog\fxc.read.1.tlog
+d:\directx\directx_client\intermediate\debug\client.tlog\fxc.write.1.tlog
+d:\directx\directx_client\intermediate\debug\client.tlog\link.command.1.tlog
+d:\directx\directx_client\intermediate\debug\client.tlog\link.read.1.tlog
+d:\directx\directx_client\intermediate\debug\client.tlog\link.write.1.tlog
