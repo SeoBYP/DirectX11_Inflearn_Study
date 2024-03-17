@@ -1,0 +1,24 @@
+#pragma once
+#include "ResourceBase.h"
+class Mesh :
+    public ResourceBase
+{
+	using Super = ResourceBase;
+public:
+	Mesh(ComPtr<ID3D11Device> device);
+	virtual ~Mesh();
+
+	void CreateDefaultRectangle();
+
+	shared_ptr<VertexBuffer> GetVertexBuffer() { return _vertexBuffer; }
+	shared_ptr<IndexBuffer> GetIndexBuffer() { return _indexBuffer; }
+
+private:
+	ComPtr<ID3D11Device> _device;
+
+	// 게임 오브젝트의 기하학적 데이터와 렌더링에 필요한 자원들(Mesh)
+	shared_ptr<Geometry<VertexTextureData>> _geometry;
+	shared_ptr<VertexBuffer> _vertexBuffer;
+	shared_ptr<IndexBuffer> _indexBuffer;
+};
+
