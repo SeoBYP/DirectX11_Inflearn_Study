@@ -70,6 +70,30 @@ void Animation::Save(const wstring& path)
 	assert(result == XMLError::XML_SUCCESS); // 파일 저장 성공 확인
 }
 
+// 애니메이션 반복 여부 설정
+void Animation::SetLoop(bool loop)
+{
+	_loop = loop;
+}
+
+// 애니메이션 반복 여부 반환
+bool Animation::IsLoop()
+{
+	return _loop;
+}
+
+// 애니메이션에 사용할 텍스처 설정
+void Animation::SetTexture(shared_ptr<Texture> texture)
+{
+	_texture = texture;
+}
+
+// 현재 설정된 텍스처 반환
+shared_ptr<Texture> Animation::GetTexture()
+{
+	return _texture;
+}
+
 // 텍스처 크기 반환
 Vec2 Animation::GetTextureSize()
 {

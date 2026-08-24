@@ -65,3 +65,13 @@ const Keyframe& Animator::GetCurrentKeyframe()
 {
 	return _currentAnimation->GetKeyframe(_currentKeyframeIndex);
 }
+
+// 재생할 애니메이션 설정
+void Animator::SetAnimation(shared_ptr<Animation> animation)
+{
+	_currentAnimation = animation;
+
+	// 이전 애니메이션의 재생 상태가 남아 인덱스가 범위를 벗어나지 않도록 초기화
+	_currentKeyframeIndex = 0;
+	_sumTime = 0.f;
+}

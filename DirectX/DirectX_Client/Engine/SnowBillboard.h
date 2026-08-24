@@ -29,6 +29,8 @@ public:
 	void SetMaterial(shared_ptr<Material> material) { _material = material; }
 	// 렌더링에 사용될 패스를 설정하는 함수입니다.
 	void SetPass(uint8 pass) { _pass = pass; }
+	// 특정 위치에 빌보드를 추가하는 함수입니다.
+	void Add(Vec3 position, Vec2 scale);
 
 private:
 	vector<VertexSnow> _vertices; // 빌보드의 정점들을 저장하는 벡터입니다.
