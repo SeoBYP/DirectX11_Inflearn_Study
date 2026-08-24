@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -132,8 +132,9 @@
       <AdditionalLibraryDirectories>$(SolutionDir)Libraries\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PreBuildEvent>
-      <Command>xcopy /Y "$(SolutionDir)Engine\*.h" "$(SolutionDir)Libraries\Include\Engine"
-xcopy /Y "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Include\Engine"</Command>
+      <Command>if not exist "$(SolutionDir)Libraries\Include\Engine" mkdir "$(SolutionDir)Libraries\Include\Engine"
+xcopy /Y /I "$(SolutionDir)Engine\*.h" "$(SolutionDir)Libraries\Include\Engine"
+xcopy /Y /I "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Include\Engine"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -159,8 +160,9 @@ xcopy /Y "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Include\Engine"</
       <AdditionalLibraryDirectories>$(SolutionDir)Libraries\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PreBuildEvent>
-      <Command>xcopy /Y "$(SolutionDir)Engine\*.h" "$(SolutionDir)Libraries\Include\Engine"
-xcopy /Y "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Include\Engine"</Command>
+      <Command>if not exist "$(SolutionDir)Libraries\Include\Engine" mkdir "$(SolutionDir)Libraries\Include\Engine"
+xcopy /Y /I "$(SolutionDir)Engine\*.h" "$(SolutionDir)Libraries\Include\Engine"
+xcopy /Y /I "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Include\Engine"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
