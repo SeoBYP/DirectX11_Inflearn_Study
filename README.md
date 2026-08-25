@@ -7,28 +7,13 @@
 ![Type](https://img.shields.io/badge/Type-학습%20프로젝트-lightgrey)
 
 > **인프런 DirectX 11 강의를 따라가며 만든 학습용 엔진입니다.**
-> 코드 자체는 강의를 따라간 것이지만, **이 저장소를 3년 뒤 새 툴체인에서 다시 굴러가게 만드는 과정**에서
-> 툴셋 이전 · 빌드 순서 경합 · 렌더링 아티팩트 원인 규명 같은 작업을 직접 했습니다.
-> 그 진단 기록이 [기술 사례](docs/troubleshooting/)에 정리되어 있습니다.
+> 상용 엔진이 감춰 주는 계층 — 정점 버퍼를 GPU에 올리고, 상수 버퍼로 행렬을 넘기고,
+> 셰이더 패스를 골라 드로우콜을 부르기까지 — 를 직접 만들며 확인했습니다.
+> 구현하면서 이해한 내용은 **[블로그 32편](https://unialgames.tistory.com/category/DirectX)** 으로 정리했고, 아래 [학습 내용](#-학습-내용--블로그-연재-32편)에 단계별로 묶어 두었습니다.
 
 ![SceneDemo](docs/images/SceneDemo.gif)
 
-**[🧩 기술 사례 — 문제 진단 기록](docs/troubleshooting/)** · **[📝 학습 정리 블로그 32편](https://unialgames.tistory.com/category/DirectX)** · [🧱 엔진 구조](#-엔진-구조) · [🔧 빌드](#-빌드--실행)
-
----
-
-## 📖 이 저장소가 증명하는 것
-
-Unity·Unreal 같은 상용 엔진이 **내부에서 무엇을 하고 있는지**를 직접 만들어 보며 확인한 기록입니다.
-정점 버퍼를 GPU에 올리고, 상수 버퍼로 행렬을 넘기고, 셰이더 패스를 골라 드로우콜을 부르는 과정을
-엔진이 감춰 주지 않는 레벨에서 다뤘습니다.
-
-- **렌더 파이프라인**: 정점/인덱스 버퍼 → 입력 레이아웃 → 상수 버퍼 → 셰이더 패스 → 드로우콜
-- **엔진 아키텍처**: GameObject / Component 구조, 씬 그래프, 리소스 매니저, 렌더 매니저
-- **조명·재질**: Ambient / Diffuse / Specular / Emissive, 노멀 매핑
-- **모델·애니메이션**: Assimp 모델 임포트, 스키닝 애니메이션, 트위닝
-- **최적화 기법**: 인스턴싱과 드로우콜, StructuredBuffer / RawBuffer / TextureBuffer
-- **공간·충돌**: AABB · OBB · Sphere, Point Test / Intersection / Raycast
+**[📚 학습 내용](#-학습-내용--블로그-연재-32편)** · [🧱 엔진 구조](#-엔진-구조) · [🖼 실행 화면](#-실행-화면) · [🔧 빌드](#-빌드--실행)
 
 ---
 
@@ -45,6 +30,96 @@ Unity·Unreal 같은 상용 엔진이 **내부에서 무엇을 하고 있는지*
 | **데모** | 36개 (씬 기반으로 실행 가능한 것 8개) |
 | **셰이더** | `.fx` 33개 |
 | **학습 기록** | [블로그 연재 32편](https://unialgames.tistory.com/category/DirectX) |
+
+---
+
+## 📚 학습 내용 — 블로그 연재 32편
+
+강의를 따라가며 **이해한 내용을 매번 글로 정리**했습니다. 아래는 그 32편을 학습 순서대로 7단계로 묶은 것입니다.
+각 단계마다 **저장소의 어느 코드에 해당하는지** 함께 적었습니다.
+
+### 1단계 · 엔진 뼈대 — "Unity는 내부에서 뭘 하고 있나"
+
+컴포넌트 기반 구조를 밑바닥부터 만들어 보며, 상용 엔진이 제공하는 개념들이 실제로 어떤 코드인지 확인한 단계입니다.
+→ 해당 코드: [`DirectX_InflearnCode_Chapter2/`](DirectX/DirectX_InflearnCode/DirectX_InflearnCode_Chapter2)
+
+| 글 | 다룬 내용 |
+|---|---|
+| [GameObject, Transform](https://unialgames.tistory.com/entry/DirectX11GameObjectTransform) | 게임 오브젝트와 계층 구조, 로컬/월드 행렬 계산 |
+| [Component, MonoBehaviour](https://unialgames.tistory.com/entry/DirectX11ComponentMonobehaviour) | 컴포넌트 생명주기(Awake/Start/Update/LateUpdate)와 스크립트 분리 |
+| [SceneManager와 MeshRenderer](https://unialgames.tistory.com/entry/DirectX11SceneManagerAndMeshRenderer) | 씬 전환과 오브젝트 순회, 렌더러 컴포넌트의 역할 |
+| [ResourceManager](https://unialgames.tistory.com/entry/DirectX11ResourceManager) | 메시·텍스처·셰이더를 이름으로 관리하고 재사용하는 구조 |
+| [RenderManager](https://unialgames.tistory.com/entry/DirectX11RenderManager) | 렌더링 데이터를 모아 상수 버퍼로 밀어 넣는 흐름 |
+| [Animation System](https://unialgames.tistory.com/entry/DirectX11AnimationSystem) | 키프레임 기반 스프라이트 애니메이션과 재생 상태 관리 |
+
+### 2단계 · 렌더링 기초 — 정점에서 픽셀까지
+
+→ 해당 코드: [`Client/01~11`](DirectX/DirectX_Client/Client), [`Shaders/01~07`](DirectX/DirectX_Client/Shaders)
+
+| 글 | 다룬 내용 |
+|---|---|
+| [3D Mesh 렌더링하기](https://unialgames.tistory.com/entry/DirectX113DMeshRendering) | 정점/인덱스 버퍼 구성과 입력 레이아웃 |
+| [Sampler의 이해](https://unialgames.tistory.com/entry/DirectX11Sampler) | 필터링과 주소 지정 모드가 화면에 미치는 영향 |
+| [Normal의 이해와 활용](https://unialgames.tistory.com/entry/DirectX11NormalMap) | 법선 벡터의 의미와 변환 시 주의점 |
+| [Depth Stencil의 이해와 활용](https://unialgames.tistory.com/entry/DirectX11DepthStencil) | 깊이 버퍼가 무엇을 판정하는가, 스텐실의 쓰임 |
+| [HeightMap을 활용한 지형 생성](https://unialgames.tistory.com/entry/DirectX11HeightMap) | 높이 맵을 읽어 정점 격자를 만드는 지형 생성 |
+
+### 3단계 · 조명과 재질 — 빛을 항으로 분해하기
+
+→ 해당 코드: [`Client/12~18`](DirectX/DirectX_Client/Client), [`Engine/Light`](DirectX/DirectX_Client/Engine/Light.h), [`Shaders/09~14`](DirectX/DirectX_Client/Shaders)
+
+| 글 | 다룬 내용 |
+|---|---|
+| [Lighting의 이해와 활용 — Ambient, Diffuse, Specular, Emissive](https://unialgames.tistory.com/entry/DirectX11LightingAmbientDiffuseSpecularEmissive) | 조명을 네 항으로 나눠 각각 무엇을 담당하는지 |
+| [Normal Mapping](https://unialgames.tistory.com/entry/DirectX11NormalMapping) | 탄젠트 공간과 법선 맵으로 디테일을 표현하는 원리 |
+
+### 4단계 · 모델과 애니메이션 — 외부 애셋 파이프라인
+
+→ 해당 코드: [`AssimpTool/`](DirectX/DirectX_Client/AssimpTool), [`Engine/Model·ModelAnimator`](DirectX/DirectX_Client/Engine)
+
+| 글 | 다룬 내용 |
+|---|---|
+| [모델 가져오기(Model Import)](https://unialgames.tistory.com/entry/DirectX11ModelImport) | Assimp로 읽어 자체 포맷(`.mesh`)으로 사전 변환하는 이유 |
+| [애니메이션 이해(Animation)](https://unialgames.tistory.com/entry/DrectX11AniamtionData) | 본 계층과 키프레임 데이터, 스키닝의 구조 |
+| [애니메이션 트위닝(Animation Tweening)](https://unialgames.tistory.com/entry/DirectX11AnimationTweening) | 두 클립 사이를 보간해 자연스럽게 전환하기 |
+
+### 5단계 · 드로우콜 최적화 — "왜 그리는 횟수가 비용인가"
+
+같은 메시를 여러 번 그릴 때 무엇이 병목이고, GPU에 대량 데이터를 넘기는 방법이 왜 여러 가지인지 다룬 단계입니다.
+→ 해당 코드: [`Engine/InstancingManager`](DirectX/DirectX_Client/Engine/InstancingManager.h), [`Engine/RawBuffer·TextureBuffer·StructuredBuffer`](DirectX/DirectX_Client/Engine)
+
+| 글 | 다룬 내용 |
+|---|---|
+| [인스턴싱(Instancing)과 드로우 콜(Draw Call)](https://unialgames.tistory.com/entry/DirectX11InstancingDrawCall) | 드로우콜이 비용인 이유와 인스턴싱이 줄이는 것 |
+| [Mesh, Model, Animation Instancing](https://unialgames.tistory.com/entry/DirectX11MeshModelAnimationInstancing) | 정적 메시 / 모델 / 스키닝 애니메이션을 각각 묶는 방법 |
+| [RawBuffer](https://unialgames.tistory.com/entry/DirectX11RawBuffer) | 바이트 단위로 접근하는 버퍼와 컴퓨트 셰이더 연동 |
+| [TextureBuffer](https://unialgames.tistory.com/entry/DirectX11TextureBuffer) | 텍스처를 데이터 저장소로 쓰는 방식 |
+| [StructuredBuffer](https://unialgames.tistory.com/entry/DirectX11StructuredBuffer) | 구조체 배열을 셰이더에 넘기는 방식과 선택 기준 |
+
+### 6단계 · 공간과 충돌 — 판정의 수학
+
+→ 해당 코드: [`Engine/*Collider`](DirectX/DirectX_Client/Engine), [`Client/CollisionDemo`](DirectX/DirectX_Client/Client/CollisionDemo.cpp)
+
+| 글 | 다룬 내용 |
+|---|---|
+| [기본 게임 도형(Sphere, AABB, OBB 등)](https://unialgames.tistory.com/entry/DirectX11BasicShapes) | 각 바운딩 볼륨의 표현 방식과 트레이드오프 |
+| [기본 게임 도형과 Point Test](https://unialgames.tistory.com/entry/DirectX11BasicShapesPointTest) | 점이 도형 안에 있는지 판정 |
+| [기본 게임 도형과 Intersection](https://unialgames.tistory.com/entry/DirectX11BasicShapesIntersection) | 도형 간 교차 검사 |
+| [기본 게임 도형과 Raycast](https://unialgames.tistory.com/entry/DirectX11BasicShapeRaycast) | 광선과 도형의 교차, 피킹의 기초 |
+| [Triangle의 Point Test, Interaction, Raycast](https://unialgames.tistory.com/entry/DirectX11TrianglePointTestInteractionRaycast) | 삼각형 단위 정밀 판정 |
+| [AABB Collision과 OBB Collision](https://unialgames.tistory.com/entry/DirectX11AABBCollisionOBBCollision) | 축 정렬과 지향 경계 상자의 차이, SAT |
+| [Collision과 SphereCollider](https://unialgames.tistory.com/entry/DirectX11CollisionAndSphereCollider) | 콜라이더를 컴포넌트로 붙여 씬에서 쓰기 |
+
+### 7단계 · 화면과 연출
+
+→ 해당 코드: [`Engine/Viewport·Billboard·SnowBillboard·Button`](DirectX/DirectX_Client/Engine)
+
+| 글 | 다룬 내용 |
+|---|---|
+| [Viewport 이해](https://unialgames.tistory.com/entry/DirectX11Viewport) | 뷰포트 변환과 화면 분할 |
+| [직교투영(Orthographic Projection)과 UI](https://unialgames.tistory.com/entry/DirectX11OrthographicProjectionAndUI) | 원근과 직교를 한 화면에 섞어 UI 그리기 |
+| [스카이박스와 스카이돔](https://unialgames.tistory.com/entry/DrectX11SkyBoxSkyDome) | 배경을 항상 카메라 뒤에 두는 방법 |
+| [빌보드(Billboard)와 파티클(Particle)](https://unialgames.tistory.com/entry/DirectX11BillboardAndParticle) | 카메라를 향해 회전하는 쿼드, 셰이더에서 위치 계산하기 |
 
 ---
 
@@ -68,8 +143,8 @@ DirectX/
 ```
 
 두 솔루션은 **같은 내용을 두 번 만든 기록**입니다.
-`DirectX_InflearnCode` 에서 컴포넌트 구조와 매니저를 먼저 익히고,
-`DirectX_Client` 에서 그 위에 렌더링 기법과 모델·애니메이션까지 확장했습니다.
+`DirectX_InflearnCode` 에서 컴포넌트 구조와 매니저를 먼저 익히고(1단계),
+`DirectX_Client` 에서 그 위에 렌더링 기법과 모델·애니메이션까지 확장했습니다(2~7단계).
 
 ---
 
@@ -105,14 +180,14 @@ FBX 등 외부 모델을 런타임에 파싱하지 않고 **자체 바이너리 
 
 > 모두 이 저장소를 빌드해 **직접 실행하고 녹화·캡처한 화면**입니다. (Debug\|x64)
 
-### SceneDemo — 모델 인스턴싱
+### SceneDemo — 모델 인스턴싱 (5단계)
 
 ![SceneDemo](docs/images/SceneDemo.gif)
 
 같은 메시를 가진 구조물·유닛을 `InstancingManager` 가 묶어 한 번에 그립니다.
 `InstancingManager::Render()` → 각 렌더러의 `RenderInstancing()` 경로입니다.
 
-### SnowDemo — 빌보드 파티클
+### SnowDemo — 빌보드 파티클 (7단계)
 
 ![SnowDemo](docs/images/SnowDemo.gif)
 
@@ -121,58 +196,12 @@ FBX 등 외부 모델을 런타임에 파싱하지 않고 **자체 바이너리 
 
 ### 그 외
 
-| `OrthographicDemo` | `CollisionDemo` | `Chapter2` |
+| `OrthographicDemo` (7단계) | `CollisionDemo` (6단계) | `Chapter2` (1단계) |
 |---|---|---|
 | ![Orthographic](docs/images/orthographic.png) | ![Collision](docs/images/collision.png) | ![Sprite](docs/images/chapter2-sprite-animation.png) |
 | 원근(구체)과 직교(UI 쿼드)를 한 화면에 | 콜라이더를 붙인 오브젝트를 씬에 배치 | 키프레임 4장을 0.1초 간격으로 순환 |
 
 `ButtonDemo` · `ViewportDemo` · `TextureBufferDemo` 캡처는 [`docs/images/`](docs/images) 에 있습니다.
-
----
-
-## 🧩 기술적 도전과 해결
-
-강의를 따라간 코드 자체보다, **그 코드를 다시 굴러가게 만드는 과정**에서 한 일이 실무와 가깝습니다.
-각 항목은 배경 → 설계 → 작업 → 고민과 선택 → 선택 이유 → 측정 결과 순으로 정리했습니다.
-
-### 애니메이션이 멈춰 있던 원인이 애니메이션 코드가 아니었던 건
-
-스프라이트가 정지해 있어 방금 구현한 `Animator` 를 의심했지만, 호출 경로를 위에서부터 대조하니 진입점이 블로킹 `GetMessage` 루프였다. 코드를 고치기 전에 **창에 메시지를 주입해 화면이 살아나는 것을 먼저 확인**해 원인을 확정했다. 서로 다른 프레임 **1/8 → 4/8**(키프레임 수와 일치), 변경량은 2줄.
-→ [상세: 진단 과정과 대안 비교](docs/troubleshooting/01-blocking-message-loop.md)
-
-### 빌보드 풀숲의 앞뒤가 뒤집혀 보이는 문제
-
-"블렌드 상태 누수"와 "깊이 테스트 미동작"이라는 그럴듯한 가설을 세웠지만, 픽셀 diff로 **둘 다 기각**했다(각각 **0.00%**, **8.29%** 변화). 추측을 멈추고 깊이값을 색으로 출력한 결과, **무더기 하나가 깊이 하나를 공유**하는 빌보드 기법 자체의 한계임이 드러났다. 코드만 읽고 판단했다면 틀린 수정을 넣었을 것이다.
-→ [상세: 가설 3개를 측정으로 기각한 과정](docs/troubleshooting/02-billboard-depth-artifact.md)
-
-### 3년 전 코드를 새 툴체인에서 되살리기
-
-VS2022(v143) → VS2026(v145) 이전 과정에서, **병렬 빌드에서만 터지는 `LNK1104`** 와 **클린 클론에서만 무한 대기하는 빌드**를 찾아 고쳤다. 전자는 `#pragma comment(lib)` 가 링커에만 말하고 빌드 시스템에는 아무것도 알리지 않아서, 후자는 `xcopy` 가 대상 폴더 부재 시 되묻기 때문이었다. 둘 다 산출물이 커밋되어 있던 탓에 그동안 드러나지 않았다.
-→ [상세: 툴셋 이전 · 빌드 순서 · 클린 클론 재현](docs/troubleshooting/03-build-system.md)
-
----
-
-## 💡 강의 코드와 실제 엔진 작업의 차이
-
-위 세 건을 하며 알게 된 것들입니다. **강의를 따라갈 때는 한 번도 마주치지 않았던 종류의 문제**였습니다.
-
-**증상과 원인은 대개 다른 계층에 있다.**
-"애니메이션이 안 움직인다"의 원인은 애니메이션 코드가 아니라 `WinMain` 의 메시지 루프였다. 증상이 보이는 곳부터 파고들면 엉뚱한 데서 시간을 쓴다. 호출 경로를 위에서부터 훑어 "여기까지는 살아 있다"를 하나씩 확정하는 편이 빨랐다.
-
-**가설은 측정으로 죽여야 한다.**
-빌보드 문제에서 그럴듯한 가설 세 개를 세웠고 셋 다 수치로 기각했다. 특히 첫 가설(블렌드 상태 누수)은 코드 근거까지 있어 확신했지만 픽셀 차이가 0.00%였다. 그대로 밀어붙였다면 문제는 남고 코드만 늘었을 것이다.
-
-**렌더링 버그는 눈으로 판단하면 안 된다.**
-"뒤 풀이 앞에 보인다"는 인상만으로는 정렬 문제인지 깊이 문제인지 구분되지 않았다. 깊이값을 색으로 출력하고 나서야 무더기가 단색으로 찍히는 것이 보였고, 그때 원인이 확정됐다. 셰이더는 런타임 컴파일이라 리빌드 없이 실험할 수 있다는 점도 그때 알았다.
-
-**빌드 시스템도 코드다.**
-`#pragma comment(lib, ...)` 는 링커에게만 말한다. MSBuild는 그 의존성을 모르므로 병렬로 빌드해도 된다고 판단하고, 그래서 **직렬에서는 성공하고 병렬에서만 터지는** 버그가 나온다. 빌드 순서는 선언해야 생긴다.
-
-**"내 컴퓨터에서는 됩니다"는 재현해야 없앨 수 있다.**
-산출물이 커밋되어 있는 동안은 아무 문제가 없었다. 추적을 해제하고 **폴더를 실제로 지운 뒤 빌드**하자마자 `xcopy` 가 입력을 기다리며 멈췄다. 클린 상태를 만들어 보지 않으면 영영 안 보이는 종류의 버그다.
-
-**작은 수정이 정답인 경우가 많다.**
-세 건의 최종 변경량은 각각 2줄, 0줄(원인 규명만), 프로젝트 설정 몇 줄이었다. 진단에 쓴 시간이 수정에 쓴 시간보다 훨씬 길었고, 그게 정상이었다.
 
 ---
 
@@ -196,7 +225,7 @@ VS2022(v143) → VS2026(v145) 이전 과정에서, **병렬 빌드에서만 터�
 실행할 데모는 [`Client/Main.cpp`](DirectX/DirectX_Client/Client/Main.cpp) 에서 바꿉니다.
 
 ```cpp
-desc.app = make_shared<SnowDemo>();   // ← 이 줄의 데모 클래스를 교체
+desc.app = make_shared<BillBoardDemo>();   // ← 이 줄의 데모 클래스를 교체
 ```
 
 씬(`CUR_SCENE`) 기반으로 작성되어 실행 화면이 나오는 데모는 다음 8개입니다.
@@ -215,27 +244,12 @@ SceneDemo       SnowDemo     TextureBufferDemo  ViewportDemo
 
 ---
 
-## 📚 학습 기록 — 블로그 연재 32편
-
-구현하면서 이해한 내용을 [블로그](https://unialgames.tistory.com/category/DirectX)에 정리했습니다.
-
-| 주제 | 다룬 내용 |
-|---|---|
-| **엔진 구조** | GameObject·Transform / Component·MonoBehaviour / SceneManager·MeshRenderer / ResourceManager / RenderManager / Animation System |
-| **렌더링 기초** | 3D Mesh 렌더링 / Sampler / Normal / Depth Stencil / HeightMap 지형 생성 |
-| **조명 · 재질** | Ambient · Diffuse · Specular · Emissive / Normal Mapping |
-| **모델 · 애니메이션** | Model Import / Animation / Animation Tweening |
-| **최적화 · 버퍼** | 인스턴싱과 드로우콜 / Mesh·Model·Animation Instancing / RawBuffer / TextureBuffer / StructuredBuffer |
-| **공간 · 충돌** | AABB·OBB Collision / Sphere·AABB·OBB 도형 / Point Test / Intersection / Raycast |
-| **기타** | 스카이박스와 스카이돔 / Viewport / 직교투영과 UI / 빌보드와 파티클 |
-
----
-
 ## 🔗 링크
 
-- **기술 사례 — 문제 진단 기록**: [`docs/troubleshooting/`](docs/troubleshooting/)
-- **학습 정리 블로그**: <https://unialgames.tistory.com/category/DirectX>
+- **학습 정리 블로그 (32편)**: <https://unialgames.tistory.com/category/DirectX>
+- **재빌드 과정의 문제 진단 기록**: [`docs/troubleshooting/`](docs/troubleshooting/)
+- **포트폴리오 수록용 문서**: [`docs/포트폴리오-DirectX11-학습프로젝트.md`](docs/포트폴리오-DirectX11-학습프로젝트.md)
 
 ---
 
-<sub>학습 출처: 인프런 DirectX 11 강의. 엔진 코드는 강의를 따라가며 작성한 것이며, 위 「기술적 도전과 해결」은 이 저장소를 VS2026 환경에서 다시 빌드·실행 가능하게 만드는 과정에서 직접 진단하고 수정한 내용입니다.</sub>
+<sub>학습 출처: 인프런 DirectX 11 강의. 엔진 코드는 강의를 따라가며 작성한 학습용 코드이며, 독자적인 시스템 설계 기여는 포함되어 있지 않습니다.</sub>
