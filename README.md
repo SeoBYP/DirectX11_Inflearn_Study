@@ -1,4 +1,4 @@
-# DirectX 11 Study — 렌더링 파이프라인부터 엔진 구조까지 직접 따라 만들기
+# DirectX 11 Study — 상용 엔진이 감춰 주는 계층을 직접 만들어 보기
 
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus&logoColor=white)
 ![DirectX 11](https://img.shields.io/badge/DirectX-11-107C10?logo=windows&logoColor=white)
@@ -6,41 +6,89 @@
 ![Platform](https://img.shields.io/badge/Platform-Windows%20x64-0078D6?logo=windows&logoColor=white)
 ![Type](https://img.shields.io/badge/Type-학습%20프로젝트-lightgrey)
 
-> **인프런 DirectX 11 강의를 따라가며 만든 학습용 엔진입니다.**
-> 상용 엔진이 감춰 주는 계층 — 정점 버퍼를 GPU에 올리고, 상수 버퍼로 행렬을 넘기고,
-> 셰이더 패스를 골라 드로우콜을 부르기까지 — 를 직접 만들며 확인했습니다.
-> 구현하면서 이해한 내용은 **[블로그 32편](https://unialgames.tistory.com/category/DirectX)** 으로 정리했고, 아래 [학습 내용](#-학습-내용--블로그-연재-32편)에 단계별로 묶어 두었습니다.
+> **인프런 DirectX 11 강의를 기반으로 로우 레벨 렌더링 과정과 엔진 내부 로직을 공부한 저장소입니다.**
+> 정점 버퍼를 GPU에 올리고, 상수 버퍼로 행렬을 넘기고, 셰이더 패스를 골라 드로우콜을 부르기까지 —
+> 상용 엔진이 대신 해 주는 일을 직접 짜 보며 확인했습니다.
+> 이해한 내용은 **[블로그 32편](https://unialgames.tistory.com/category/DirectX)** 으로 정리했습니다.
 
 ![SceneDemo](docs/images/SceneDemo.gif)
 
-**[📚 학습 내용](#-학습-내용--블로그-연재-32편)** · [🧱 엔진 구조](#-엔진-구조) · [🖼 실행 화면](#-실행-화면) · [🔧 빌드](#-빌드--실행)
+**[🎯 왜 공부했나](#-왜-이걸-공부했는가)** · **[💡 얻은 것](#-공부하면서-얻은-것)** · **[📚 학습 내용](#-학습-내용--블로그-연재-32편)** · **[⚠️ 한계](#️-한계)** · [🧱 엔진 구조](#-엔진-구조)
 
 ---
 
-## 🧾 한눈에 보기
+## 🎯 왜 이걸 공부했는가
 
-| 항목 | 내용 |
-|---|---|
-| **성격** | 강의 기반 학습 프로젝트 (포트폴리오상 **보조 프로젝트**) |
-| **언어 / 표준** | C++20 |
-| **그래픽 API** | Direct3D 11, Effects11(FX11) 셰이더 프레임워크 |
-| **빌드 환경** | Visual Studio 2026 · MSVC v145 · Windows SDK 10.0 · Debug\|x64 |
-| **솔루션** | 2개 / 프로젝트 5개 |
-| **엔진 코드** | 소스 55개 · 헤더 59개 (서드파티 제외) |
-| **데모** | 36개 (씬 기반으로 실행 가능한 것 8개) |
-| **셰이더** | `.fx` 33개 |
-| **학습 기록** | [블로그 연재 32편](https://unialgames.tistory.com/category/DirectX) |
+상용 엔진은 렌더링을 잘 감춰 줍니다. 그래서 **드로우콜 · 배칭 · 머티리얼 인스턴스 같은 말을 쓰면서도 그 아래에서 무슨 일이 일어나는지는 모른 채** 개발할 수 있습니다.
+
+프로파일러가 "드로우콜 300"이라고 말할 때, 그게 왜 비용인지 구조로 설명하지 못하면 최적화는 **인터넷에서 본 팁을 순서대로 시도해 보는 일**이 됩니다. 무엇을 줄이는 조치인지 모르니 효과가 없어도 이유를 알 수 없고, 효과가 있어도 다음에 재현하지 못합니다.
+
+그래서 엔진이 감춰 주는 계층을 한 번은 직접 만들어 보기로 했습니다.
+
+**DirectX 11을 고른 이유**는 두 가지입니다.
+
+- **추상화 수준이 학습에 적당합니다.** DX12·Vulkan은 커맨드 리스트·리소스 배리어·디스크립터 힙까지 직접 다뤄야 해서, 파이프라인 개념보다 API 사용법에 시간이 쏠립니다. DX11은 파이프라인 단계 자체에 집중할 수 있습니다.
+- **엔진 구조까지 같이 만들어 볼 수 있는 규모입니다.** 렌더링만이 아니라 컴포넌트 시스템 · 씬 · 리소스 매니저까지 한 프로젝트 안에서 다뤄, "상용 엔진의 그 개념이 실제로는 어떤 코드인가"를 확인할 수 있었습니다.
+
+---
+
+## 💡 공부하면서 얻은 것
+
+추상적인 "이해했다"가 아니라, **무엇을 만들어 보고 무엇이 보이게 됐는지**로 적었습니다.
+
+### 1. 드로우콜이 왜 비용인지 구조로 알게 됐다
+
+`InstancingManager` 를 직접 만들어 보니, 비용의 정체는 "그리는 횟수" 자체가 아니라 **오브젝트마다 상수 버퍼를 갱신하고 파이프라인 상태를 바꾸는 것**이었습니다. 인스턴싱은 "같은 메시니까 한 번에 그린다"가 아니라, 오브젝트별로 달랐던 데이터를 **인스턴스 버퍼로 옮겨 상태 변경을 없애는 것**이었습니다.
+
+이 저장소에는 개별 렌더 경로(`MeshRenderer::Update()`)와 인스턴싱 경로(`InstancingManager::Render()` → `RenderInstancing()`)가 **둘 다 남아 있어** 구조 차이를 코드로 비교할 수 있습니다.
+
+> 덕분에 Unity의 SRP Batcher · GPU Instancing · 머티리얼 인스턴스가 각각 무엇을 줄이는 조치인지 구분해서 접근할 수 있게 됐습니다.
+
+### 2. 셰이더에 데이터를 넘기는 방법이 왜 여러 가지인지
+
+`ConstantBuffer` · `StructuredBuffer` · `RawBuffer` · `TextureBuffer` 를 각각 만들어 써 보니 선택 기준이 갈렸습니다 — **크기 제한, 접근 패턴, 갱신 빈도**입니다.
+
+그래서 상수 버퍼 슬롯을 **갱신 빈도별로 나누는 관행**(프레임당 한 번 / 오브젝트당 한 번)이 왜 생겼는지 납득이 됐습니다. 매 드로우콜마다 큰 버퍼를 통째로 올리는 것이 무엇을 낭비하는지 보였기 때문입니다.
+
+### 3. 컴포넌트 구조를 두 번 만들고 나서야 설계 의도가 보였다
+
+이 저장소에는 컴포넌트 시스템이 **두 번** 구현되어 있습니다. `Chapter2` 에서 `GameObject` · `Transform` · `Component` 와 매니저 4종만으로 최소 구조를 만들고, `DirectX_Client` 에서 그 위에 렌더링 기법을 올렸습니다.
+
+`GameObject::Update()` 가 컴포넌트를 순회하고 렌더러 컴포넌트가 그 안에서 드로우콜까지 부르는 흐름을 직접 짜 보니, **Unity의 실행 순서 · 생명주기 콜백 · 컴포넌트 분리 원칙이 왜 그런 형태인지** 이해됐습니다.
+
+### 4. 공간 변환이 "외운 것"에서 "만든 것"이 됐다
+
+월드 · 뷰 · 프로젝션 행렬을 직접 곱해 상수 버퍼로 넘기고, 빌보드에서는 카메라 방향으로부터 `right` · `up` 벡터를 손으로 만들어 사각형을 펼쳤습니다.
+
+```hlsl
+float3 forward = position.xyz - CameraPosition();
+float3 right   = normalize(cross(up, forward));
+position.xyz  += (input.uv.x - 0.5f) * right * input.scale.x;
+```
+
+행렬 순서를 틀리면 화면이 어떻게 깨지는지를 직접 겪은 것이, 공식을 외운 것보다 오래 남았습니다.
+
+### 5. 조명을 항으로 분해해 보고 셰이더가 읽히기 시작했다
+
+Ambient · Diffuse · Specular · Emissive 를 **각각 별도 데모로 하나씩** 구현했습니다. 한꺼번에 만들었다면 "조명 코드"로 뭉뚱그렸을 텐데, 나눠서 만들다 보니 각 항이 무엇을 담당하고 어떤 입력이 필요한지가 분리돼 보였습니다.
+
+이후 노멀 매핑에서 탄젠트 공간을 다룰 때도, 법선이 어느 항에 쓰이는지 알고 있어 접근이 쉬웠습니다.
+
+### 6. 애셋 파이프라인이 왜 필요한지
+
+FBX를 런타임에 파싱하면 느립니다. 그래서 Assimp로 읽어 **자체 바이너리 포맷(`.mesh` / `.clip`)으로 사전 변환하는 오프라인 툴**(`AssimpTool`)을 만들었습니다.
+
+만들어 보고 나서 상용 엔진의 임포트 단계 — 왜 애셋을 그대로 쓰지 않고 한 번 변환해서 보관하는지 — 가 무엇을 위한 것인지 알게 됐습니다.
 
 ---
 
 ## 📚 학습 내용 — 블로그 연재 32편
 
-강의를 따라가며 **이해한 내용을 매번 글로 정리**했습니다. 아래는 그 32편을 학습 순서대로 7단계로 묶은 것입니다.
+구현하면서 이해한 내용을 **매번 글로 정리**했습니다. 아래는 32편을 학습 순서대로 7단계로 묶은 것입니다.
 각 단계마다 **저장소의 어느 코드에 해당하는지** 함께 적었습니다.
 
 ### 1단계 · 엔진 뼈대 — "Unity는 내부에서 뭘 하고 있나"
 
-컴포넌트 기반 구조를 밑바닥부터 만들어 보며, 상용 엔진이 제공하는 개념들이 실제로 어떤 코드인지 확인한 단계입니다.
 → 해당 코드: [`DirectX_InflearnCode_Chapter2/`](DirectX/DirectX_InflearnCode/DirectX_InflearnCode_Chapter2)
 
 | 글 | 다룬 내용 |
@@ -66,7 +114,7 @@
 
 ### 3단계 · 조명과 재질 — 빛을 항으로 분해하기
 
-→ 해당 코드: [`Client/12~18`](DirectX/DirectX_Client/Client), [`Engine/Light`](DirectX/DirectX_Client/Engine/Light.h), [`Shaders/09~14`](DirectX/DirectX_Client/Shaders)
+→ 해당 코드: [`Client/12~18`](DirectX/DirectX_Client/Client), [`Shaders/09~14`](DirectX/DirectX_Client/Shaders)
 
 | 글 | 다룬 내용 |
 |---|---|
@@ -75,7 +123,7 @@
 
 ### 4단계 · 모델과 애니메이션 — 외부 애셋 파이프라인
 
-→ 해당 코드: [`AssimpTool/`](DirectX/DirectX_Client/AssimpTool), [`Engine/Model·ModelAnimator`](DirectX/DirectX_Client/Engine)
+→ 해당 코드: [`AssimpTool/`](DirectX/DirectX_Client/AssimpTool)
 
 | 글 | 다룬 내용 |
 |---|---|
@@ -85,8 +133,7 @@
 
 ### 5단계 · 드로우콜 최적화 — "왜 그리는 횟수가 비용인가"
 
-같은 메시를 여러 번 그릴 때 무엇이 병목이고, GPU에 대량 데이터를 넘기는 방법이 왜 여러 가지인지 다룬 단계입니다.
-→ 해당 코드: [`Engine/InstancingManager`](DirectX/DirectX_Client/Engine/InstancingManager.h), [`Engine/RawBuffer·TextureBuffer·StructuredBuffer`](DirectX/DirectX_Client/Engine)
+→ 해당 코드: [`Engine/InstancingManager`](DirectX/DirectX_Client/Engine/InstancingManager.h), [`Engine/`](DirectX/DirectX_Client/Engine) 의 각종 Buffer
 
 | 글 | 다룬 내용 |
 |---|---|
@@ -98,7 +145,7 @@
 
 ### 6단계 · 공간과 충돌 — 판정의 수학
 
-→ 해당 코드: [`Engine/*Collider`](DirectX/DirectX_Client/Engine), [`Client/CollisionDemo`](DirectX/DirectX_Client/Client/CollisionDemo.cpp)
+→ 해당 코드: [`Engine/`](DirectX/DirectX_Client/Engine) 의 Collider 계열, [`Client/CollisionDemo`](DirectX/DirectX_Client/Client/CollisionDemo.cpp)
 
 | 글 | 다룬 내용 |
 |---|---|
@@ -112,7 +159,7 @@
 
 ### 7단계 · 화면과 연출
 
-→ 해당 코드: [`Engine/Viewport·Billboard·SnowBillboard·Button`](DirectX/DirectX_Client/Engine)
+→ 해당 코드: [`Engine/`](DirectX/DirectX_Client/Engine) 의 Viewport · Billboard · Button
 
 | 글 | 다룬 내용 |
 |---|---|
@@ -120,6 +167,30 @@
 | [직교투영(Orthographic Projection)과 UI](https://unialgames.tistory.com/entry/DirectX11OrthographicProjectionAndUI) | 원근과 직교를 한 화면에 섞어 UI 그리기 |
 | [스카이박스와 스카이돔](https://unialgames.tistory.com/entry/DrectX11SkyBoxSkyDome) | 배경을 항상 카메라 뒤에 두는 방법 |
 | [빌보드(Billboard)와 파티클(Particle)](https://unialgames.tistory.com/entry/DirectX11BillboardAndParticle) | 카메라를 향해 회전하는 쿼드, 셰이더에서 위치 계산하기 |
+
+---
+
+## ⚠️ 한계
+
+이 저장소가 **증명하지 못하는 것**을 분명히 적습니다.
+
+**강의를 따라간 학습 코드입니다.**
+구조와 구현 모두 강의를 따라간 것이고, 강의 범위를 넘어선 독자적인 시스템 설계는 없습니다. 이 저장소가 보여 주는 것은 "무엇을 이해했는가"까지입니다.
+
+**성능을 측정하지 않았습니다.**
+인스턴싱을 구현했지만 개별 렌더링과의 드로우콜 수 · 프레임 타임을 **같은 조건에서 비교해 본 적이 없습니다.** 구조를 이해한 것과 측정해서 개선한 것은 다르고, 이 저장소는 전자까지입니다. 두 경로가 코드에 모두 남아 있으니 측정 자체는 바로 할 수 있는데, 아직 하지 않았습니다.
+
+**렌더링 기법의 깊이가 얕습니다.**
+그림자 매핑 · 후처리 · PBR · 지연 렌더링은 다루지 않았습니다. 조명도 단일 방향광 수준입니다.
+
+**현대적인 렌더링 주제는 범위 밖입니다.**
+멀티스레드 렌더링 · 커맨드 리스트 · 리소스 배리어 같은 DX12/Vulkan 세대의 주제는 DX11 수준에서 다루지 않았습니다.
+
+**데모 36개 중 실행되는 것은 8개입니다.**
+학습이 진행되며 구조를 씬(`CUR_SCENE`) 기반으로 바꿨는데, 이전 `RENDER->` 방식으로 작성된 28개는 해당 호출이 주석 처리된 채 남아 있어 창은 뜨지만 화면이 비어 있습니다.
+
+**빌보드 데모에 시각적 결함이 남아 있습니다.**
+풀 무더기가 서로 앞뒤가 뒤집혀 보이고 밑동에 계단 모양 경계가 드러납니다. 원인은 두 가지로 파악했습니다 — 무더기 하나가 **카메라를 향한 평면 한 장**이라 잎마다의 깊이가 존재하지 않는 것, 그리고 밑변이 모두 `y=0` 인데 **지면이 렌더링되지 않아** 검은 배경과 만나는 것입니다. 해법(MSAA + AlphaToCoverage, 잎 단위 지오메트리 분리, 지면 배치)까지 정리했지만 **적용하지 않았습니다.**
 
 ---
 
@@ -142,10 +213,6 @@ DirectX/
 └─ imgui-master/                # Dear ImGui (벤더링)
 ```
 
-두 솔루션은 **같은 내용을 두 번 만든 기록**입니다.
-`DirectX_InflearnCode` 에서 컴포넌트 구조와 매니저를 먼저 익히고(1단계),
-`DirectX_Client` 에서 그 위에 렌더링 기법과 모델·애니메이션까지 확장했습니다(2~7단계).
-
 ---
 
 ## 🧱 엔진 구조
@@ -166,14 +233,6 @@ DirectX/
 | **리소스 · 유틸** | `ResourceManager` · `ResourceBase` · `FileUtils` · `MathUtils` · `SimpleMath` · `tinyxml2` |
 | **툴 연동** | `ImGUIManager` (Dear ImGui) |
 
-`Component` 를 상속한 렌더러 컴포넌트의 `Update()` 안에서 상수 버퍼를 채우고 드로우콜까지 수행하는 구조입니다.
-Unity의 컴포넌트 모델을 참고한 형태로, `GameObject::Update()` → 각 컴포넌트 `Update()` 순으로 흐릅니다.
-
-### AssimpTool
-
-FBX 등 외부 모델을 런타임에 파싱하지 않고 **자체 바이너리 포맷으로 미리 변환**하는 오프라인 툴입니다.
-`Converter` 가 Assimp로 읽어 메시(`.mesh`) · 재질 · 애니메이션(`.clip`) 으로 나눠 저장합니다.
-
 ---
 
 ## 🖼 실행 화면
@@ -185,14 +244,12 @@ FBX 등 외부 모델을 런타임에 파싱하지 않고 **자체 바이너리 
 ![SceneDemo](docs/images/SceneDemo.gif)
 
 같은 메시를 가진 구조물·유닛을 `InstancingManager` 가 묶어 한 번에 그립니다.
-`InstancingManager::Render()` → 각 렌더러의 `RenderInstancing()` 경로입니다.
 
 ### SnowDemo — 빌보드 파티클 (7단계)
 
 ![SnowDemo](docs/images/SnowDemo.gif)
 
 낙하 위치를 CPU가 아니라 **셰이더에서 시간 기반으로 계산**합니다.
-`SnowBillboard::Update()` 가 경과 시간을 상수 버퍼로 넘기면 정점 셰이더가 위치를 만듭니다.
 
 ### 그 외
 
@@ -201,21 +258,15 @@ FBX 등 외부 모델을 런타임에 파싱하지 않고 **자체 바이너리 
 | ![Orthographic](docs/images/orthographic.png) | ![Collision](docs/images/collision.png) | ![Sprite](docs/images/chapter2-sprite-animation.png) |
 | 원근(구체)과 직교(UI 쿼드)를 한 화면에 | 콜라이더를 붙인 오브젝트를 씬에 배치 | 키프레임 4장을 0.1초 간격으로 순환 |
 
-`ButtonDemo` · `ViewportDemo` · `TextureBufferDemo` 캡처는 [`docs/images/`](docs/images) 에 있습니다.
-
 ---
 
 ## 🔧 빌드 & 실행
-
-### 요구 사항
 
 | 항목 | 버전 |
 |---|---|
 | Visual Studio | 2026 (MSVC **v145**) |
 | Windows SDK | 10.0 (설치본 자동 선택) |
 | 구성 | **Debug \| x64** — 동봉 라이브러리가 x64 전용이라 Win32는 링크되지 않습니다 |
-
-### 절차
 
 1. `DirectX/DirectX_Client/GameCoding.sln` 을 엽니다.
 2. 솔루션 탐색기에서 **`Client` 우클릭 → 시작 프로젝트로 설정**
@@ -228,26 +279,21 @@ FBX 등 외부 모델을 런타임에 파싱하지 않고 **자체 바이너리 
 desc.app = make_shared<BillBoardDemo>();   // ← 이 줄의 데모 클래스를 교체
 ```
 
-씬(`CUR_SCENE`) 기반으로 작성되어 실행 화면이 나오는 데모는 다음 8개입니다.
-나머지는 학습 중 구조를 씬 기반으로 바꾸면서 이전 `RENDER->` 경로가 주석 처리된 상태입니다.
+화면이 나오는 데모는 다음 8개입니다(위 [한계](#️-한계) 참고).
 
 ```
 BillBoardDemo   ButtonDemo   CollisionDemo      OrthographicDemo
 SceneDemo       SnowDemo     TextureBufferDemo  ViewportDemo
 ```
 
-리소스는 `..\Shaders\`, `..\Resources\` 같은 **상위 상대 경로**로 참조하므로,
-작업 디렉터리가 `Client\` 또는 `Binaries\` 여야 합니다. (VS 기본값인 `$(ProjectDir)` 로 동작)
-
-`DirectX/DirectX_InflearnCode/DirectX_InflearnCode.sln` 도 같은 방식으로 빌드됩니다.
-단 Chapter2는 리소스를 파일명만으로 읽어 **작업 디렉터리가 프로젝트 폴더여야** 합니다(VS에서 F5로 실행).
+리소스는 `..\Shaders\`, `..\Resources\` 같은 **상위 상대 경로**로 참조하므로 작업 디렉터리가 `Client\` 또는 `Binaries\` 여야 합니다(VS 기본값으로 동작).
+`DirectX_InflearnCode.sln` 도 같은 방식이며, Chapter2는 리소스를 파일명만으로 읽어 **작업 디렉터리가 프로젝트 폴더여야** 합니다.
 
 ---
 
 ## 🔗 링크
 
 - **학습 정리 블로그 (32편)**: <https://unialgames.tistory.com/category/DirectX>
-- **재빌드 과정의 문제 진단 기록**: [`docs/troubleshooting/`](docs/troubleshooting/)
 - **포트폴리오 수록용 문서**: [`docs/포트폴리오-DirectX11-학습프로젝트.md`](docs/포트폴리오-DirectX11-학습프로젝트.md)
 
 ---
