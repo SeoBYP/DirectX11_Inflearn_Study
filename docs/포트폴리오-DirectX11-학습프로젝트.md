@@ -15,7 +15,7 @@
 
 | 항목 | 내용 |
 |---|---|
-| 성격 | 인프런 DirectX 11 강의 기반 **학습 프로젝트** (독자 설계 기여 없음) |
+| 성격 | 인프런 [\[게임 프로그래머 도약반\] DirectX11 입문](https://www.inflearn.com/course/directx11-%EA%B2%8C%EC%9E%84%EA%B0%9C%EB%B0%9C-%EB%8F%84%EC%95%BD%EB%B0%98) 기반 **학습 프로젝트** (독자 설계 기여 없음) |
 | 기간 | {YYYY.MM ~ YYYY.MM} |
 | 인원 | 개인 |
 | 기술 환경 | C++20 · Direct3D 11 · Effects11(FX11) · Assimp · DirectXTex · Dear ImGui |

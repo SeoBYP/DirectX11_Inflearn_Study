@@ -6,7 +6,7 @@
 ![Platform](https://img.shields.io/badge/Platform-Windows%20x64-0078D6?logo=windows&logoColor=white)
 ![Type](https://img.shields.io/badge/Type-학습%20프로젝트-lightgrey)
 
-> **인프런 DirectX 11 강의를 기반으로 로우 레벨 렌더링 과정과 엔진 내부 로직을 공부한 저장소입니다.**
+> **인프런 [\[게임 프로그래머 도약반\] DirectX11 입문](https://www.inflearn.com/course/directx11-%EA%B2%8C%EC%9E%84%EA%B0%9C%EB%B0%9C-%EB%8F%84%EC%95%BD%EB%B0%98) 강의를 기반으로 로우 레벨 렌더링 과정과 엔진 내부 로직을 공부한 저장소입니다.**
 > 정점 버퍼를 GPU에 올리고, 상수 버퍼로 행렬을 넘기고, 셰이더 패스를 골라 드로우콜을 부르기까지 —
 > 상용 엔진이 대신 해 주는 일을 직접 짜 보며 확인했습니다.
 > 이해한 내용은 **[블로그 32편](https://unialgames.tistory.com/category/DirectX)** 으로 정리했습니다.
@@ -269,8 +269,8 @@ SceneDemo       SnowDemo     TextureBufferDemo  ViewportDemo
 
 ## 🔗 링크
 
+- **원 강의**: [\[게임 프로그래머 도약반\] DirectX11 입문 — Rookiss](https://www.inflearn.com/course/directx11-%EA%B2%8C%EC%9E%84%EA%B0%9C%EB%B0%9C-%EB%8F%84%EC%95%BD%EB%B0%98)
 - **학습 정리 블로그 (32편)**: <https://unialgames.tistory.com/category/DirectX>
-- **포트폴리오 수록용 문서**: [`docs/포트폴리오-DirectX11-학습프로젝트.md`](docs/포트폴리오-DirectX11-학습프로젝트.md)
 
 ---
 
@@ -307,4 +307,4 @@ SceneDemo       SnowDemo     TextureBufferDemo  ViewportDemo
 
 ---
 
-<sub>학습 출처: 인프런 DirectX 11 강의. 엔진 코드는 강의를 따라가며 작성한 학습용 코드이며, 독자적인 시스템 설계 기여는 포함되어 있지 않습니다.</sub>
+<sub>학습 출처: 인프런 <a href="https://www.inflearn.com/course/directx11-%EA%B2%8C%EC%9E%84%EA%B0%9C%EB%B0%9C-%EB%8F%84%EC%95%BD%EB%B0%98">[게임 프로그래머 도약반] DirectX11 입문</a> (Rookiss). 엔진 코드는 강의를 따라가며 작성한 학습용 코드이며, 독자적인 시스템 설계 기여는 포함되어 있지 않습니다.</sub>
